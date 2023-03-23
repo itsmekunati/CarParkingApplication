@@ -7,11 +7,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class CarParkingController {
 
     @Autowired
     CarParkingService carParkingService;
+
+    @GetMapping("/carAudit")
+    public ResponseEntity<List<Car>> getCarAudit(@RequestParam String reg){
+        List<Car> cars = carParkingService.getCarAudit(reg);
+        return ResponseEntity.ok().body(cars);
+    }
+
+    @GetMapping("/car")
+    public ResponseEntity<Car> getCar(@RequestParam String reg){
+        Car car = carParkingService.getCar(reg);
+        return ResponseEntity.ok().body(car);
+    }
 
     @GetMapping("/getSpaces")
     public long getSpaces() {
@@ -25,8 +39,8 @@ public class CarParkingController {
     }
 
     @PostMapping("/checkOut")
-    public ResponseEntity<Double> checkOut(@RequestBody Car car){
-        double charges = carParkingService.checkOut(car);
+    public ResponseEntity<Double> checkOut(@RequestParam String reg){
+        double charges = carParkingService.checkOut(reg);
         return new ResponseEntity<>(charges ,HttpStatus.OK) ;
 
     }

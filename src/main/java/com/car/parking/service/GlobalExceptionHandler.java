@@ -14,6 +14,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
+    public ResponseEntity<Object> handleAuthenticationException(CarAuditException e) {
+        return new ResponseEntity<>("Car Never used this Parking", HttpStatus.OK);
+    }
+
+    @ExceptionHandler
     public ResponseEntity<Object> handleAuthenticationException(CarAllReadyExistException e) {
         return new ResponseEntity<>("Car Already in Parking", HttpStatus.OK);
     }

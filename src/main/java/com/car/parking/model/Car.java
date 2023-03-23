@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,6 +25,9 @@ public class Car {
 
     @Column
     private Date checkedIn;
+
+    @Column
+    private int spaceAllocated;
 
     @Column
     private Date checkOut;
