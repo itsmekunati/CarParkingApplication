@@ -2,6 +2,7 @@ package com.car.parking.service;
 
 import com.car.parking.model.Car;
 import com.car.parking.repo.CarRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
+@Slf4j
 public class CarParkingService {
 
     @Autowired
@@ -34,7 +36,9 @@ public class CarParkingService {
     public long getAvailableSpaces() {
         try {
             readLock.lock();
-            return (totalSpaces - carRepository.countByInParking(true));
+            long spaces = totalSpaces - carRepository.countByInParking(true);
+            log.info("Available spaces {}", spaces);
+            return spaces;
         }
         finally {
             readLock.unlock();
@@ -42,16 +46,20 @@ public class CarParkingService {
     }
 
     public List<Car> getCarAudit(String reg) {
+        log.info("Finding a Car with reg {} ", reg);
         List<Car> cars = carRepository.findByReg(reg);
         if(cars.isEmpty()) {
+            log.error("Unable to find a Car with Reg {} ", reg);
             throw new CarAuditException(reg);
         }
         return cars;
     }
 
     public Car getCar(String reg) {
+        log.info("Finding a Car with reg {} ", reg);
         Car car = carRepository.findByRegAndInParking(reg, true);
         if (car == null){
+            log.error("Unable to find a Car with Reg {} ", reg);
             throw new CarNotFoundException(reg);
         }
         return car;
@@ -60,8 +68,10 @@ public class CarParkingService {
     public  void checkIn(Car car) {
         try {
             writeLock.lock();
+            log.info("Finding a Car with reg {} ", car.getReg());
             Car existingCar = carRepository.findByRegAndInParking(car.getReg(), true);
             if (existingCar != null) {
+                log.error("Car already parked with Reg {} ", car.getReg());
                 throw new CarAllReadyExistException(car.getReg());
             }
             if (getAvailableSpaces() == 0) {
@@ -71,7 +81,9 @@ public class CarParkingService {
             car.setCheckedIn(new Date());
             car.setInParking(true);
             car.setSpaceAllocated(numbers.get(0));
+            log.info("Saving the Car with reg {} ", car.getReg());
             carRepository.save(car);
+            log.info("Removing Space from the Pool {} ", numbers.get(0));
             removeTheSpace();
         }
         finally {
@@ -83,8 +95,10 @@ public class CarParkingService {
     public double checkOut(String reg) {
         try {
             writeLock.lock();
+            log.info("Finding a Car with reg {} ", reg);
             Car foundCar = carRepository.findByRegAndInParking(reg, true);
             if (foundCar == null) {
+                log.error("Car not found with Reg {} ", reg);
                 throw new CarNotFoundException(reg);
             }
             Car car = new Car();
@@ -93,7 +107,9 @@ public class CarParkingService {
             car.setCheckOut(new Date());
             car.setInParking(false);
             car.setCheckedIn(foundCar.getCheckedIn());
+            log.info("Adding Space back to the Pool {} ", foundCar.getSpaceAllocated());
             addTheSpace(foundCar.getSpaceAllocated());
+            log.info("Updating the Car with reg {} ", reg);
             carRepository.save(car);
             return calculatePrice(car.getCheckedIn(), car.getCheckOut());
         }
