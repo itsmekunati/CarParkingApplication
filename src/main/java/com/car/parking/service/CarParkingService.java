@@ -1,6 +1,7 @@
 package com.car.parking.service;
 
 import com.car.parking.model.Car;
+import com.car.parking.model.CarProperties;
 import com.car.parking.repo.CarRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,14 @@ public class CarParkingService {
 
     @Autowired
     CarRepository carRepository;
+
+    @Autowired
+    CarProperties carProperties;
+
     Random random = new Random();
     final List<Integer> numbers = IntStream.rangeClosed(1, 100).boxed().collect(Collectors.toList());
 
-    private final long totalSpaces = 100;
+    //private final long totalSpaces = 100;
 
     ReadWriteLock lock = new ReentrantReadWriteLock();
     // ...
@@ -36,7 +41,7 @@ public class CarParkingService {
     public long getAvailableSpaces() {
         try {
             readLock.lock();
-            long spaces = totalSpaces - carRepository.countByInParking(true);
+            long spaces = carProperties.getTotalCount() - carRepository.countByInParking(true);
             log.info("Available spaces {}", spaces);
             return spaces;
         }

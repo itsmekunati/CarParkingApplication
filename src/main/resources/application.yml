@@ -1,6 +1,9 @@
 server:
   port: 8082
 
+car:
+  totalCount: 100
+
 spring:
   datasource:
     driverClassName: org.h2.Driver
@@ -12,3 +15,11 @@ spring:
       enabled: true
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
+
+management:
+  endpoint:
+    health:
+      group:
+        custom:
+          showComponents: always
+          showDetails: always
