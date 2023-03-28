@@ -17,3 +17,4 @@ Endpoints:
 * localhost:8082/checkIn (POST) : Check the Spaces available, and Car not already Parked , then assign a Parking space
 * localhost:8082/checkOut (POST) : Check Car in Parking, if yes, Calculate the Price and release the space
 * localhost:8082/getSpaces(GET): To get the Number of Spaces Available ( Currently total spaced hardcoded to 100)
+* localhost:8082/actuator/health/custom (GET) : Health Custom end point to check status of the service
