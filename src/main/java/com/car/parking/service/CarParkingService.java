@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -146,4 +147,9 @@ public class CarParkingService {
     }
 
 
+    public List<Car> getAllCars() {
+        List<Car> cars = new ArrayList<>();
+        carRepository.findAll().forEach(cars::add);
+        return cars;
+    }
 }
