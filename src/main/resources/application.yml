@@ -7,7 +7,9 @@ car:
 spring:
  data:
    mongodb:
-     uri: mongodb+srv://username:password@arkcluster.rxvlt.mongodb.net/BookStore
+     username: ENC(SUTq+v5TnCWiqJQc60V4A24BuQMN4x+rZsUPXO3RIXuX7mKLmEgJDOLJ1zbRkADT)
+     password: ENC(u0gExqn/gYyirudfYVqnoTWGf2gzTk00kZL3cjwPH7EcWH5X8x/5pnUXpg/px3cA)
+     uri: mongodb+srv://${spring.data.mongodb.username}:${spring.data.mongodb.password}@arkcluster.rxvlt.mongodb.net/BookStore
 
 management:
   endpoint:
