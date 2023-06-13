@@ -30,10 +30,6 @@ public class CarParkingService {
     CarProperties carProperties;
 
     Random random = new Random();
-    final List<Integer> numbers = IntStream.rangeClosed(1, 100).boxed().collect(Collectors.toList());
-
-    //private final long totalSpaces = 100;
-
     ReadWriteLock lock = new ReentrantReadWriteLock();
     // ...
     Lock writeLock = lock.writeLock();
@@ -49,6 +45,10 @@ public class CarParkingService {
         finally {
             readLock.unlock();
         }
+    }
+
+    public List<Integer> getSpaces(){
+        return IntStream.rangeClosed((int) (101-getAvailableSpaces()), 100).boxed().collect(Collectors.toList());
     }
 
     public List<Car> getCarAudit(String reg) {
@@ -76,6 +76,7 @@ public class CarParkingService {
             writeLock.lock();
             log.info("Finding a Car with reg {} ", car.getReg());
             Car existingCar = carRepository.findByRegAndInParking(car.getReg(), true);
+            List<Integer> spacesArray = getSpaces();
             if (existingCar != null) {
                 log.error("Car already parked with Reg {} ", car.getReg());
                 throw new CarAllReadyExistException(car.getReg());
@@ -86,10 +87,10 @@ public class CarParkingService {
             car.setId(Math.abs(random.nextInt()));
             car.setCheckedIn(new Date());
             car.setInParking(true);
-            car.setSpaceAllocated(numbers.get(0));
+            car.setSpaceAllocated(spacesArray.get(0));
             log.info("Saving the Car with reg {} ", car.getReg());
             carRepository.save(car);
-            log.info("Removing Space from the Pool {} ", numbers.get(0));
+            log.info("Removing Space from the Pool {} ", spacesArray.get(0));
             removeTheSpace();
         }
         finally {
@@ -126,11 +127,13 @@ public class CarParkingService {
     }
 
     public void removeTheSpace() {
-        numbers.remove(0);
+        List<Integer> spacesArray = getSpaces();
+        spacesArray.remove(0);
     }
 
     public void addTheSpace(int space) {
-        numbers.add(0, space);
+        List<Integer> spacesArray = getSpaces();
+        spacesArray.add(0, space);
     }
 
     public double calculatePrice(Date checkInDate, Date checkOutDate) {
