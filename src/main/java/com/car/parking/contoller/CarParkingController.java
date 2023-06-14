@@ -1,22 +1,25 @@
 package com.car.parking.contoller;
 
 import com.car.parking.model.Car;
+import com.car.parking.model.CarDetails;
 import com.car.parking.service.CarParkingService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
 @RequestMapping("/api")
 public class CarParkingController {
 
-    @Autowired
-    CarParkingService carParkingService;
+    private CarParkingService carParkingService;
+    CarParkingController(CarParkingService carParkingService){
+        this.carParkingService = carParkingService;
+    }
 
     @GetMapping("/carAudit")
     public ResponseEntity<List<Car>> getCarAudit(@RequestParam String reg){
@@ -33,10 +36,14 @@ public class CarParkingController {
     }
 
     @GetMapping("/cars")
-    public ResponseEntity<List<Car>> getCars(){
+    public ResponseEntity<List<CarDetails>> getCars(){
         log.info("Calling the getCar Service to get Car Audit Details");
         List<Car> cars = carParkingService.getAllCars();
-        return ResponseEntity.ok().body(cars);
+        List<CarDetails>  carsDetails = cars
+                .stream()
+                .filter(Car::isInParking)
+                .map(t -> new CarDetails(t.getReg(), t.getCheckedIn(), t.getSpaceAllocated())).toList();
+        return ResponseEntity.ok().body(carsDetails);
     }
     @GetMapping("/getSpaces")
     public long getSpaces() {

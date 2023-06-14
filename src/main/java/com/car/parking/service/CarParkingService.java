@@ -4,7 +4,6 @@ import com.car.parking.model.Car;
 import com.car.parking.model.CarProperties;
 import com.car.parking.repo.CarRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -23,15 +22,16 @@ import java.util.stream.IntStream;
 @Slf4j
 public class CarParkingService {
 
-    @Autowired
-    CarRepository carRepository;
+    private CarRepository carRepository;
+    private CarProperties carProperties;
 
-    @Autowired
-    CarProperties carProperties;
+    CarParkingService(CarRepository carRepository, CarProperties carProperties){
+        this.carRepository = carRepository;
+        this.carProperties = carProperties;
+    }
 
     Random random = new Random();
     ReadWriteLock lock = new ReentrantReadWriteLock();
-    // ...
     Lock writeLock = lock.writeLock();
     Lock readLock = lock.readLock();
 
